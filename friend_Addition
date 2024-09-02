@@ -1,0 +1,50 @@
+!pip install beautifulsoup4
+import requests
+import json
+from bs4 import BeautifulSoup as bs
+from IPython import display
+mail=input("your emailid")
+password=input("your password")
+login_url='https://codeforces.com/enter'
+r=requests.get(login_url)
+b = bs(r.text, 'html.parser')
+ct = b.find('input', attrs={'name': 'csrf_token'})['value']
+
+s=requests.session()
+data = {
+         'csrf_token': ct,
+         'action': 'enter',
+         'ftaa': 'pqzey89vd5e4tdk7ya',
+         'bfaa': '572b9dc0280d2581d9e3344d5ba75ac3',
+         'handleOrEmail': mail,
+         'password': password,
+         '_tta': '448'
+       }
+r=s.post(login_url,data)
+names=["shashwat_nayak"]
+for name in names:
+    url="https://codeforces.com/profile/"+name
+    r=s.post(url)
+    b = bs(r.text, 'html.parser')
+    v = b.find('img', {"class":"addFriend"})
+    if v is not None:
+       ct2=b.find('img', {"class":"addFriend"})['frienduserid']
+    ct3=b.find('input',{"name":"csrf_token"})['value']
+    data_2 ={
+    "friendUserId": ct2,
+    "isAdd" : "true",
+    "csrf_token" : ct3
+    }
+    url="https://codeforces.com/data/friend";
+    r=s.post(url,data_2);
+url="https://codeforces.com/friends"
+r=s.post(url,data_2);
+ans=bs(r.text, 'html.parser')
+ans=ans.find_all('td',attrs={"style":"text-align:left;"})
+# print(ans)
+frens=[]
+for i in ans:
+   frens.append(i.text)
+frens=frens[3:]
+for fren in frens:
+  print(fren)
